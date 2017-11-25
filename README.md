@@ -4,6 +4,7 @@ It employes Principal Component Analysis (PCA) and K-means clustering techniques
 
 Best thing would be to follow my blog-post for implementation. The description about how the change detection is performed on satellite imagery can be read from my blog:
 
+https://appliedmachinelearning.wordpress.com/2017/11/25/unsupervised-changed-detection-in-multi-temporal-satellite-images-using-pca-k-means-python-code/
 
 I have also uploaded sample images of multi-temporal pairs taken from the LANDSAT images available United States Geological Survey (USGS) website. 
 
