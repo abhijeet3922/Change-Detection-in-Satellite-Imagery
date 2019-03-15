@@ -9,19 +9,22 @@ def find_vector_set(diff_image, new_size):
    
     i = 0
     j = 0
-    vector_set = np.zeros(((new_size[0] * new_size[1]) / 25, 25))
+    vector_set = np.zeros((int(new_size[0] * new_size[1] / 25), 25))
+
+    print('\nvector_set shape',vector_set.shape)
+    
     while i < vector_set.shape[0]:
         while j < new_size[0]:
             k = 0
             while k < new_size[1]:
                 block   = diff_image[j:j+5, k:k+5]
+                #print(i,j,k,block.shape)
                 feature = block.ravel()
                 vector_set[i, :] = feature
                 k = k + 5
             j = j + 5
         i = i + 1
         
-    print '\nvector_set shape', vector_set.shape
             
     mean_vec   = np.mean(vector_set, axis = 0)    
     vector_set = vector_set - mean_vec
@@ -45,7 +48,7 @@ def find_FVS(EVS, diff_image, mean_vec, new):
         
     FVS = np.dot(feature_vector_set, EVS)
     FVS = FVS - mean_vec
-    print "\nfeature vector space size", FVS.shape
+    print("\nfeature vector space size",FVS.shape)
     return FVS
 
 def clustering(FVS, components, new):
@@ -56,6 +59,7 @@ def clustering(FVS, components, new):
     count  = Counter(output)
 
     least_index = min(count, key = count.get)            
+    print(new[0],new[1])
     change_map  = np.reshape(output,(new[0] - 4, new[1] - 4))
     
     return least_index, change_map
@@ -63,18 +67,19 @@ def clustering(FVS, components, new):
    
 def find_PCAKmeans(imagepath1, imagepath2):
     
-    print 'Operating'
+    print('Operating')
     
     image1 = imread(imagepath1)
     image2 = imread(imagepath2)
-    
-    new_size = np.asarray(image1.shape) / 5 * 5
+    print(image1.shape,image2.shape) 
+    new_size = np.asarray(image1.shape) / 5
+    new_size = new_size.astype(int) * 5
     image1 = imresize(image1, (new_size)).astype(np.int16)
     image2 = imresize(image2, (new_size)).astype(np.int16)
     
     diff_image = abs(image1 - image2)   
     imsave('diff.jpg', diff_image)
-    print '\nBoth images resized to ',new_size
+    print('\nBoth images resized to ',new_size)
         
     vector_set, mean_vec = find_vector_set(diff_image, new_size)
     
@@ -84,7 +89,7 @@ def find_PCAKmeans(imagepath1, imagepath2):
         
     FVS     = find_FVS(EVS, diff_image, mean_vec, new_size)
     
-    print '\ncomputing k means'
+    print('\ncomputing k means')
     
     components = 3
     least_index, change_map = clustering(FVS, components, new_size)
@@ -104,8 +109,12 @@ def find_PCAKmeans(imagepath1, imagepath2):
 
     
 if __name__ == "__main__":
-    a = 'Andasol_09051987.jpg'
-    b = 'Andasol_09122013.jpg'
+    a = 'ElephantButte_08201991.jpg'
+    b = 'ElephantButte_08272011.jpg'
+    a1 = 'Dubai_11122012.jpg'
+    b1 = 'Dubai_11272000.jpg'
+    a2 = 'Andasol_09051987.jpg'
+    b2 = 'Andasol_09122013.jpg'
     find_PCAKmeans(a,b)    
     
     
