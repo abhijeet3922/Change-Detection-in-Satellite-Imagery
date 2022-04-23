@@ -3,13 +3,15 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from collections import Counter
-from scipy.misc import imread, imresize, imsave
+from imageio import imread, imsave
+from PIL import Image
+import PIL
 
 def find_vector_set(diff_image, new_size):
    
     i = 0
     j = 0
-    vector_set = np.zeros((int(new_size[0] * new_size[1] / 25), 25))
+    vector_set = np.zeros((int(new_size[0] * new_size[1] / 75), 75))
 
     print('\nvector_set shape',vector_set.shape)
     
@@ -31,7 +33,6 @@ def find_vector_set(diff_image, new_size):
     
     return vector_set, mean_vec
     
-  
 def find_FVS(EVS, diff_image, mean_vec, new):
     
     i = 2 
@@ -74,8 +75,13 @@ def find_PCAKmeans(imagepath1, imagepath2):
     print(image1.shape,image2.shape) 
     new_size = np.asarray(image1.shape) / 5
     new_size = new_size.astype(int) * 5
-    image1 = imresize(image1, (new_size)).astype(np.int16)
-    image2 = imresize(image2, (new_size)).astype(np.int16)
+    image1 = Image.fromarray(image1)
+    size = tuple((np.array(image1.size)).astype(int))
+    image1 = np.array(image1.resize(size, PIL.Image.BICUBIC))
+    
+    image2 = Image.fromarray(image2)
+    size = tuple((np.array(image2.size)).astype(int))
+    image2 = np.array(image2.resize(size, PIL.Image.BICUBIC))
     
     diff_image = abs(image1 - image2)   
     imsave('diff.jpg', diff_image)
@@ -93,7 +99,7 @@ def find_PCAKmeans(imagepath1, imagepath2):
     
     components = 3
     least_index, change_map = clustering(FVS, components, new_size)
-    
+    print(change_map)
     change_map[change_map == least_index] = 255
     change_map[change_map != 255] = 0
     
@@ -106,15 +112,3 @@ def find_PCAKmeans(imagepath1, imagepath2):
     cleanChangeMap = cv2.erode(change_map,kernel)
     imsave("changemap.jpg", change_map)
     imsave("cleanchangemap.jpg", cleanChangeMap)
-
-    
-if __name__ == "__main__":
-    a = 'ElephantButte_08201991.jpg'
-    b = 'ElephantButte_08272011.jpg'
-    a1 = 'Dubai_11122012.jpg'
-    b1 = 'Dubai_11272000.jpg'
-    a2 = 'Andasol_09051987.jpg'
-    b2 = 'Andasol_09122013.jpg'
-    find_PCAKmeans(a,b)    
-    
-    
